@@ -45,5 +45,30 @@ def most_expensive_baked_good():
     most_expensive_serialized = most_expensive.to_dict()
     return make_response( most_expensive_serialized,   200  )
 
+@app.route('/baked_goods', methods = ['GET','POST'])
+def baked_goods():
+    if request.method == 'GET':
+        baked_goods = [baked_good.to_dict() for baked_good in BakedGood.query.all()]
+
+        response = make_response(jsonify(baked_goods), 200)
+        return response
+    elif request.method == 'POST':
+        new_baked_good = BakedGood(
+            name = request.form.get('name'),
+            price = request.form.get('price'),
+            created_at = request.form.get('created_at'),
+            updated_at = request.form.get('updated_at'),
+            bakery_id = request.form.get('bakery_id')
+        )
+
+        db.session.add(new_baked_good)
+        db.session.commit()
+
+        baked_good_dict = new_baked_good.to_dict()
+
+        response = make_response(baked_good_dict, 201)
+
+        return response
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
